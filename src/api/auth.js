@@ -26,28 +26,25 @@ const handleResponse = async (response, defaultErrorMessage) => {
   return data;
 };
 
-const postJson = async (url, body) => {
+const postJson = async (url, body, defaultErrorMessage) => {
   const response = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  return response;
+  return handleResponse(response, defaultErrorMessage);
 };
 
 export const registerUser = async (userData) => {
-  const response = await postJson(`${API_BASE}/register`, userData);
-  return handleResponse(response, 'Registration failed');
+  return postJson(`${API_BASE}/register`, userData, 'Registration failed');
 };
 
 export const loginUser = async (credentials) => {
-  const response = await postJson(`${API_BASE}/login`, credentials);
-  return handleResponse(response, 'Login failed');
+  return postJson(`${API_BASE}/login`, credentials, 'Login failed');
 };
 
 export const loginAdmin = async (credentials) => {
-  const response = await postJson(`${API_BASE}/admin-login`, credentials);
-  return handleResponse(response, 'Admin login failed');
+  return postJson(`${API_BASE}/admin-login`, credentials, 'Admin login failed');
 };
 
 export const getAdminMetrics = async () => {
@@ -63,11 +60,9 @@ export const getUserComplaints = async (userId) => {
 };
 
 export const submitComplaint = async (complaintData) => {
-  const response = await postJson(`${API_ROOT}/complaints`, complaintData);
-  return handleResponse(response, 'Complaint submission failed');
+  return postJson(`${API_ROOT}/complaints`, complaintData, 'Complaint submission failed');
 };
 
 export const resetAppData = async () => {
-  const response = await postJson(`${API_BASE}/reset`, {});
-  return handleResponse(response, 'Reset failed');
+  return postJson(`${API_BASE}/reset`, {}, 'Reset failed');
 };
