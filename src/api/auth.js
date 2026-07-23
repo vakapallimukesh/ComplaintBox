@@ -7,14 +7,22 @@ const parseResponse = async (response) => {
 
   try {
     return JSON.parse(text);
-  } catch {
-    throw new Error('Server returned invalid JSON response.');
+  } catch (error) {
+    console.error('Failed to parse response:', text);
+    throw new Error('Server returned invalid JSON response. Please ensure the backend server is running.');
   }
 };
 
 const getJson = async (url) => {
-  const response = await fetch(url);
-  return handleResponse(response, 'Request failed');
+  try {
+    const response = await fetch(url);
+    return handleResponse(response, 'Request failed');
+  } catch (error) {
+    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      throw new Error('Cannot connect to server. Please ensure the backend server is running on port 5001.');
+    }
+    throw error;
+  }
 };
 
 const handleResponse = async (response, defaultErrorMessage) => {
@@ -27,12 +35,19 @@ const handleResponse = async (response, defaultErrorMessage) => {
 };
 
 const postJson = async (url, body, defaultErrorMessage) => {
-  const response = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  return handleResponse(response, defaultErrorMessage);
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    return handleResponse(response, defaultErrorMessage);
+  } catch (error) {
+    if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      throw new Error('Cannot connect to server. Please ensure the backend server is running on port 5001.');
+    }
+    throw error;
+  }
 };
 
 export const registerUser = async (userData) => {

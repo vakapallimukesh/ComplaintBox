@@ -1,16 +1,83 @@
-# React + Vite
+# Complaint Box System
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A full-stack complaint management system built with React, Vite, and Express.
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- Student complaint submission and tracking
+- Admin dashboard for complaint management
+- User authentication for students and admins
+- Real-time complaint status updates
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- **Frontend:** React, Vite, React Router, Recharts
+- **Backend:** Node.js, Express
+- **Styling:** CSS with custom properties
 
-## Expanding the ESLint configuration
+## Setup Instructions
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Prerequisites
+- Node.js (v14 or higher)
+- npm or yarn
+
+### Installation
+
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd complaint-box-main
+```
+
+2. Install dependencies
+```bash
+npm install
+```
+
+### Running the Application
+
+**IMPORTANT:** You need to run both the frontend and backend servers simultaneously.
+
+1. **Start the Backend Server** (in one terminal):
+```bash
+npm run server
+```
+The backend will run on `http://localhost:5001`
+
+2. **Start the Frontend Development Server** (in another terminal):
+```bash
+npm run dev
+```
+The frontend will run on `http://localhost:5173`
+
+### Admin Credentials
+
+- **Email:** `mukesh@gamil.co`
+- **Password:** `mukesh`
+
+### Available Scripts
+
+- `npm run dev` - Start the frontend development server
+- `npm run server` - Start the backend server
+- `npm run build` - Build for production
+- `npm run preview` - Preview production build
+
+## Troubleshooting
+
+If you see "Server returned invalid JSON response" or "Cannot connect to server":
+- Make sure the backend server is running (`npm run server`)
+- Verify the backend is running on port 5001
+- Check that both servers are running simultaneously
+
+## Project Structure
+
+```
+├── src/
+│   ├── api/          # API service functions
+│   ├── components/   # Reusable components
+│   ├── layouts/      # Layout components
+│   ├── pages/        # Page components
+│   └── main.jsx      # Application entry point
+├── server.js         # Backend server
+└── public/           # Static assets
+```
