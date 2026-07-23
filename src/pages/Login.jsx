@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { loginUser, resetAppData } from '../api/auth';
+import { loginUser } from '../api/auth';
 
 const Login = () => {
     const navigate = useNavigate();
@@ -60,27 +60,7 @@ const Login = () => {
                     <button type="submit" className="btn btn-primary" style={{ padding: '0.75rem' }} disabled={isSubmitting}>
                         {isSubmitting ? 'Signing in...' : 'Login'}
                     </button>
-                        </form>
-
-                <button
-                    type="button"
-                    className="btn btn-outline"
-                    style={{ width: '100%', marginTop: '1rem' }}
-                    onClick={async () => {
-                        setError('');
-                        try {
-                            localStorage.removeItem('complaintUser');
-                            localStorage.removeItem('complaintAdmin');
-                            await resetAppData();
-                            alert('All stored data cleared. You can register and login again.');
-                            navigate('/register');
-                        } catch (err) {
-                            setError(err.message);
-                        }
-                    }}
-                >
-                    Clear all stored data
-                </button>
+                </form>
 
                 {error && (
                     <div style={{ marginTop: '1rem', color: '#dc2626', fontSize: '0.9rem' }}>
