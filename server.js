@@ -4,15 +4,34 @@ import cors from 'cors';
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-app.use(cors({ origin: 'http://localhost:5173' }));
+// Allow requests from GitHub Pages and localhost
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  'https://vakapallimukesh.github.io'
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(null, true); // Allow all origins for now
+    }
+  },
+  credentials: true
+}));
+
 app.use(express.json());
 
 const users = [];
 const complaints = [];
 const adminUser = {
   id: 'admin-1',
-  email: 'admin@college.edu',
-  password: 'admin123',
+  email: 'mukesh@gamil.co',
+  password: 'mukesh',
   name: 'Campus Administrator'
 };
 

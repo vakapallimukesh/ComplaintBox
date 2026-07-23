@@ -69,6 +69,15 @@ If you see "Server returned invalid JSON response" or "Cannot connect to server"
 - Verify the backend is running on port 5001
 - Check that both servers are running simultaneously
 
+## Deployment
+
+For production deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+**Quick Deploy:**
+1. Deploy backend to Render.com (free)
+2. Update `.env.production` with your backend URL
+3. Run `npm run deploy` to deploy frontend to GitHub Pages
+
 ## Project Structure
 
 ```

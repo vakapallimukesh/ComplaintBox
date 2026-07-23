@@ -1,5 +1,6 @@
-const API_BASE = '/api/auth';
-const API_ROOT = '/api';
+const API_URL = import.meta.env.VITE_API_URL || '';
+const API_BASE = `${API_URL}/api/auth`;
+const API_ROOT = `${API_URL}/api`;
 
 const parseResponse = async (response) => {
   const text = await response.text();
