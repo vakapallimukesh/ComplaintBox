@@ -1,6 +1,6 @@
 # Complaint Box System
 
-A full-stack complaint management system built with React, Vite, and Express.
+A full-stack complaint management system built with React and Vite - **Frontend Only Version** (uses browser localStorage).
 
 ## Features
 
@@ -8,12 +8,17 @@ A full-stack complaint management system built with React, Vite, and Express.
 - Admin dashboard for complaint management
 - User authentication for students and admins
 - Real-time complaint status updates
+- **No backend required** - All data stored in browser localStorage
 
 ## Tech Stack
 
 - **Frontend:** React, Vite, React Router, Recharts
-- **Backend:** Node.js, Express
+- **Storage:** Browser localStorage (no server needed)
 - **Styling:** CSS with custom properties
+
+## Live Demo
+
+Visit: https://vakapallimukesh.github.io/ComplaintBox
 
 ## Setup Instructions
 
@@ -25,8 +30,8 @@ A full-stack complaint management system built with React, Vite, and Express.
 
 1. Clone the repository
 ```bash
-git clone <repository-url>
-cd complaint-box-main
+git clone https://github.com/vakapallimukesh/ComplaintBox.git
+cd ComplaintBox
 ```
 
 2. Install dependencies
@@ -34,49 +39,47 @@ cd complaint-box-main
 npm install
 ```
 
-### Running the Application
+### Running the Application Locally
 
-**IMPORTANT:** You need to run both the frontend and backend servers simultaneously.
-
-1. **Start the Backend Server** (in one terminal):
-```bash
-npm run server
-```
-The backend will run on `http://localhost:5001`
-
-2. **Start the Frontend Development Server** (in another terminal):
+**Start the Development Server:**
 ```bash
 npm run dev
 ```
-The frontend will run on `http://localhost:5173`
+The app will run on `http://localhost:5173`
 
 ### Admin Credentials
 
 - **Email:** `mukesh@gamil.co`
 - **Password:** `mukesh`
 
-### Available Scripts
+### Student Access
 
-- `npm run dev` - Start the frontend development server
-- `npm run server` - Start the backend server
+1. Click "Register here" on the login page
+2. Fill in your details and create an account
+3. Login with your credentials
+
+## Available Scripts
+
+- `npm run dev` - Start the development server
 - `npm run build` - Build for production
+- `npm run deploy` - Deploy to GitHub Pages
 - `npm run preview` - Preview production build
 
-## Troubleshooting
+## Important Notes
 
-If you see "Server returned invalid JSON response" or "Cannot connect to server":
-- Make sure the backend server is running (`npm run server`)
-- Verify the backend is running on port 5001
-- Check that both servers are running simultaneously
+- **Data Storage:** All data is stored in browser localStorage
+- **Data Persistence:** Data persists only in the current browser
+- **Private Browsing:** Data will be lost when closing private/incognito windows
+- **Clear Data:** Clear browser data will delete all complaints and users
 
 ## Deployment
 
-For production deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md)
+The app is automatically deployed to GitHub Pages. To deploy updates:
 
-**Quick Deploy:**
-1. Deploy backend to Render.com (free)
-2. Update `.env.production` with your backend URL
-3. Run `npm run deploy` to deploy frontend to GitHub Pages
+```bash
+npm run build
+npm run deploy
+```
 
 ## Project Structure
 
