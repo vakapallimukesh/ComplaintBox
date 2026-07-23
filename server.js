@@ -30,7 +30,7 @@ const users = [];
 const complaints = [];
 const adminUser = {
   id: 'admin-1',
-  email: 'mukesh@gamil.co',
+  email: 'mukesh@gmail.com',
   password: 'mukesh',
   name: 'Campus Administrator'
 };
