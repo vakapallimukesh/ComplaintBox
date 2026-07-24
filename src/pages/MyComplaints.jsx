@@ -113,6 +113,11 @@ const MyComplaints = () => {
                                             {getStatusIcon(complaint.status)}
                                             {getStatusBadge(complaint.status)}
                                         </div>
+                                        {complaint.adminResponse && (
+                                            <div style={{ marginTop: '0.5rem', fontSize: '0.75rem', color: 'var(--text-light)', fontStyle: 'italic' }}>
+                                                Response: {complaint.adminResponse}
+                                            </div>
+                                        )}
                                     </td>
                                 </tr>
                             ))}

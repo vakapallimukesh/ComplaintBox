@@ -1,33 +1,68 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Save, AlertCircle, User, MapPin, MessageSquare } from 'lucide-react';
+import { getComplaintById, updateComplaintStatus } from '../api/auth';
 
 const AdminUpdate = () => {
     const navigate = useNavigate();
     const { id } = useParams();
     const [isUpdating, setIsUpdating] = useState(false);
+    const [complaint, setComplaint] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [status, setStatus] = useState('Pending');
+    const [response, setResponse] = useState('');
+    const [error, setError] = useState('');
 
-    // Placeholder data
-    const complaint = {
-        id: id || 'C-1002',
-        student: 'Rahul Sharma',
-        rollNo: '20SC-045',
-        title: 'Water leakage in Washroom',
-        category: 'Plumbing',
-        location: 'Hostel Block B, 2nd Floor',
-        description: 'There is a severe water leakage in the first washroom on the left side of the corridor. The floor is always wet and it might cause someone to slip.',
-        status: 'In Progress',
-        dateSubmitted: '2026-02-18',
+    useEffect(() => {
+        loadComplaint();
+    }, [id]);
+
+    const loadComplaint = async () => {
+        try {
+            const data = await getComplaintById(id);
+            setComplaint(data.complaint);
+            setStatus(data.complaint.status);
+            setResponse(data.complaint.adminResponse || '');
+            setLoading(false);
+        } catch (err) {
+            setError(err.message || 'Complaint not found');
+            setLoading(false);
+        }
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setIsUpdating(true);
-        setTimeout(() => {
+        setError('');
+
+        try {
+            await updateComplaintStatus(id, status, response);
             alert('Status updated successfully!');
             navigate('/admin/complaints');
-        }, 1500);
+        } catch (err) {
+            setError(err.message || 'Failed to update complaint');
+            setIsUpdating(false);
+        }
     };
+
+    if (loading) {
+        return (
+            <div style={{ textAlign: 'center', padding: '3rem', color: 'var(--text-light)' }}>
+                Loading complaint details...
+            </div>
+        );
+    }
+
+    if (error && !complaint) {
+        return (
+            <div style={{ textAlign: 'center', padding: '3rem' }}>
+                <p style={{ color: 'var(--danger)', marginBottom: '1rem' }}>{error}</p>
+                <button className="btn btn-outline" onClick={() => navigate('/admin/complaints')}>
+                    Back to Complaints
+                </button>
+            </div>
+        );
+    }
 
     return (
         <div style={{ maxWidth: '900px', margin: '0 auto' }}>
@@ -49,7 +84,7 @@ const AdminUpdate = () => {
                     <div className="card">
                         <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '1.5rem' }}>
                             <h3 style={{ fontSize: '1.25rem', fontWeight: '700', color: 'var(--primary-blue)' }}>{complaint.title}</h3>
-                            <span className="badge badge-in-progress" style={{ padding: '0.25rem 1rem' }}>{complaint.status}</span>
+                            <span className={`badge badge-${complaint.status.toLowerCase().replace(' ', '-')}`} style={{ padding: '0.25rem 1rem' }}>{complaint.status}</span>
                         </div>
 
                         <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
@@ -63,14 +98,14 @@ const AdminUpdate = () => {
                                     <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Submitted By</p>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <User size={16} />
-                                        <span style={{ fontWeight: '500' }}>{complaint.student} ({complaint.rollNo})</span>
+                                        <span style={{ fontWeight: '500' }}>{complaint.student}</span>
                                     </div>
                                 </div>
                                 <div>
                                     <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', fontWeight: '600', textTransform: 'uppercase', marginBottom: '0.25rem' }}>Location</p>
                                     <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                                         <MapPin size={16} />
-                                        <span style={{ fontWeight: '500' }}>{complaint.location}</span>
+                                        <span style={{ fontWeight: '500' }}>{complaint.branch} - {complaint.locationDetail}</span>
                                     </div>
                                 </div>
                             </div>
@@ -86,7 +121,11 @@ const AdminUpdate = () => {
                         <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
                             <div>
                                 <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: '500' }}>Update Status</label>
-                                <select className="input-field" defaultValue={complaint.status}>
+                                <select 
+                                    className="input-field" 
+                                    value={status}
+                                    onChange={(e) => setStatus(e.target.value)}
+                                >
                                     <option value="Pending">Pending</option>
                                     <option value="In Progress">In Progress</option>
                                     <option value="Resolved">Resolved</option>
@@ -100,12 +139,20 @@ const AdminUpdate = () => {
                                     className="input-field"
                                     style={{ minHeight: '120px', resize: 'vertical' }}
                                     placeholder="Type your response to the student here..."
+                                    value={response}
+                                    onChange={(e) => setResponse(e.target.value)}
                                     required
                                 ></textarea>
                                 <p style={{ fontSize: '0.75rem', color: 'var(--text-light)', marginTop: '0.5rem' }}>
                                     This response will be visible to the student on their dashboard.
                                 </p>
                             </div>
+
+                            {error && (
+                                <div style={{ color: 'var(--danger)', fontSize: '0.9rem' }}>
+                                    {error}
+                                </div>
+                            )}
 
                             <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                                 <button type="button" onClick={() => navigate('/admin/complaints')} className="btn btn-outline" style={{ flex: 1 }}>Discard</button>
@@ -122,7 +169,7 @@ const AdminUpdate = () => {
                         <h4 style={{ fontWeight: '700', marginBottom: '1rem', color: 'var(--text-dark)', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                             <AlertCircle size={18} /> Processing Tips
                         </h4>
-                        <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem', color: '#0c4a6e', padding: '0' }}>
+                        <ul style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', fontSize: '0.875rem', color: 'var(--text-light)', padding: '0', listStyle: 'none' }}>
                             <li>• Inspect the location within 24 hours.</li>
                             <li>• Provide clear timelines for resolution.</li>
                             <li>• For rejected complaints, state a valid reason.</li>

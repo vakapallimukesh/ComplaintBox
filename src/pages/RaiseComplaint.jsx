@@ -1,12 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Upload, MapPin, Send, AlertCircle, ArrowLeft, Building2 } from 'lucide-react';
+import { submitComplaint } from '../api/auth';
 
 const RaiseComplaint = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isSubmitted, setIsSubmitted] = useState(false);
+    const [isSubmitting, setIsSubmitting] = useState(false);
     const [category, setCategory] = useState('');
+    const [error, setError] = useState('');
 
     const [formData, setFormData] = useState({
         title: '',
@@ -34,12 +37,39 @@ const RaiseComplaint = () => {
         });
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsSubmitted(true);
-        setTimeout(() => {
-            navigate('/my-complaints');
-        }, 2000);
+        setError('');
+        setIsSubmitting(true);
+
+        try {
+            const savedUser = localStorage.getItem('complaintUser');
+            if (!savedUser) {
+                setError('User not found. Please login again.');
+                setIsSubmitting(false);
+                return;
+            }
+
+            const user = JSON.parse(savedUser);
+
+            const complaintData = {
+                userId: user.id,
+                title: formData.title,
+                branch: formData.branch,
+                locationDetail: formData.locationDetail,
+                description: formData.description,
+                category: category
+            };
+
+            await submitComplaint(complaintData);
+            setIsSubmitted(true);
+            setTimeout(() => {
+                navigate('/my-complaints');
+            }, 2000);
+        } catch (err) {
+            setError(err.message || 'Failed to submit complaint');
+            setIsSubmitting(false);
+        }
     };
 
     const branches = [
@@ -178,8 +208,16 @@ const RaiseComplaint = () => {
 
                     <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
                         <button type="button" onClick={() => navigate('/complaint-portal')} className="btn btn-outline" style={{ flex: 1 }}>Cancel</button>
-                        <button type="submit" className="btn btn-primary" style={{ flex: 2 }}>Submit Complaint</button>
+                        <button type="submit" className="btn btn-primary" style={{ flex: 2 }} disabled={isSubmitting}>
+                            {isSubmitting ? 'Submitting...' : 'Submit Complaint'}
+                        </button>
                     </div>
+
+                    {error && (
+                        <div style={{ color: 'var(--danger)', fontSize: '0.9rem', textAlign: 'center' }}>
+                            {error}
+                        </div>
+                    )}
                 </form>
             </div>
         </div>
