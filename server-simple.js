@@ -85,6 +85,12 @@ app.post('/api/auth/register', async (req, res) => {
       return res.status(400).json({ message: 'All fields are required.' });
     }
 
+    // Ensure data structure exists
+    await db.read();
+    if (!db.data) db.data = { users: [], complaints: [] };
+    if (!db.data.users) db.data.users = [];
+    if (!db.data.complaints) db.data.complaints = [];
+
     // Check if user already exists
     const existingUser = db.data.users.find(
       (user) => user.email === email || user.rollNumber === rollNumber
@@ -127,6 +133,11 @@ app.post('/api/auth/login', async (req, res) => {
     if (!identifier || !password) {
       return res.status(400).json({ message: 'Identifier and password are required.' });
     }
+
+    // Ensure data structure exists
+    await db.read();
+    if (!db.data) db.data = { users: [], complaints: [] };
+    if (!db.data.users) db.data.users = [];
 
     const user = findUser(identifier);
     if (!user || user.password !== password) {
