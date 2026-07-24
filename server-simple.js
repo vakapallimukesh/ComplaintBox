@@ -29,9 +29,11 @@ async function initializeDatabase() {
   } catch (error) {
     console.error('Database initialization error:', error);
     // Use in-memory database as fallback
-    db = { data: { users: [], complaints: [] } };
-    db.write = async () => {};
-    db.read = async () => {};
+    db = { 
+      data: { users: [], complaints: [] },
+      write: async () => { console.log('In-memory write'); },
+      read: async () => { console.log('In-memory read'); }
+    };
     console.log('⚠️ Using in-memory database');
     return false;
   }
@@ -76,13 +78,19 @@ function findUser(identifier) {
 // Register endpoint
 app.post('/api/auth/register', async (req, res) => {
   try {
+    console.log('Register request:', req.body);
     const { fullName, rollNumber, email, password, department } = req.body;
 
     if (!fullName || !rollNumber || !email || !password || !department) {
       return res.status(400).json({ message: 'All fields are required.' });
     }
 
-    if (findUser(email) || findUser(rollNumber)) {
+    // Check if user already exists
+    const existingUser = db.data.users.find(
+      (user) => user.email === email || user.rollNumber === rollNumber
+    );
+
+    if (existingUser) {
       return res.status(409).json({ message: 'Email or roll number already registered.' });
     }
 
@@ -98,6 +106,8 @@ app.post('/api/auth/register', async (req, res) => {
 
     db.data.users.push(newUser);
     await db.write();
+    
+    console.log('User registered:', newUser.id);
 
     return res.status(201).json({ 
       message: 'User registered successfully.', 
@@ -105,7 +115,7 @@ app.post('/api/auth/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Register error:', error);
-    return res.status(500).json({ message: 'Registration failed. Please try again.' });
+    return res.status(500).json({ message: `Registration failed: ${error.message}` });
   }
 });
 
