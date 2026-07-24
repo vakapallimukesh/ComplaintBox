@@ -4,14 +4,9 @@ import {
     ClipboardCheck,
     AlertTriangle,
     CheckCircle2,
-    PieChart as PieChartIcon,
     TrendingUp
 } from 'lucide-react';
 import { getAdminMetrics, resetAppData } from '../api/auth';
-import {
-    PieChart, Pie, Cell, ResponsiveContainer, Tooltip,
-    BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend
-} from 'recharts';
 
 const AdminDashboard = () => {
     const [metrics, setMetrics] = useState({
@@ -27,7 +22,7 @@ const AdminDashboard = () => {
         { title: 'Total Registered Users', countKey: 'totalUsers', icon: <Users />, color: 'var(--primary-blue)' },
         { title: 'Active Complaints', countKey: 'activeComplaints', icon: <AlertTriangle />, color: '#f59e0b' },
         { title: 'In Progress', countKey: 'inProgress', icon: <TrendingUp />, color: 'var(--primary-blue)' },
-        { title: 'Resolved (Monthly)', countKey: 'resolvedMonthly', icon: <CheckCircle2 />, color: '#10b981' },
+        { title: 'Resolved', countKey: 'resolvedMonthly', icon: <CheckCircle2 />, color: '#10b981' },
     ];
 
     useEffect(() => {
@@ -44,6 +39,10 @@ const AdminDashboard = () => {
     };
 
     const handleReset = async () => {
+        if (!confirm('Are you sure you want to clear all data? This will delete all users and complaints.')) {
+            return;
+        }
+        
         try {
             await resetAppData();
             setMetrics({
@@ -54,31 +53,12 @@ const AdminDashboard = () => {
                 alerts: 0,
                 totalComplaints: 0
             });
-            alert('All admin data cleared. Registered users and complaints are reset.');
+            alert('All data cleared successfully.');
         } catch (error) {
             console.error(error);
             alert(error.message || 'Failed to reset data.');
         }
     };
-
-    const pieData = [
-        { name: 'Hostel', value: 45 },
-        { name: 'Lab', value: 25 },
-        { name: 'Classroom', value: 20 },
-        { name: 'Other', value: 10 },
-    ];
-
-    const barData = [
-        { name: 'Mon', count: 12 },
-        { name: 'Tue', count: 19 },
-        { name: 'Wed', count: 15 },
-        { name: 'Thu', count: 22 },
-        { name: 'Fri', count: 30 },
-        { name: 'Sat', count: 8 },
-        { name: 'Sun', count: 5 },
-    ];
-
-    const COLORS = ['#b91c1c', '#000000', '#10b981', '#f59e0b', '#ef4444'];
 
     return (
         <div>
@@ -106,49 +86,26 @@ const AdminDashboard = () => {
                 ))}
             </div>
 
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '2rem' }}>
-                {/* Complaints by Category */}
-                <div className="card">
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: '700', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <PieChartIcon size={20} /> Complaints by Category
-                    </h3>
-                    <div style={{ height: '300px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <PieChart>
-                                <Pie
-                                    data={pieData}
-                                    cx="50%"
-                                    cy="50%"
-                                    innerRadius={60}
-                                    outerRadius={80}
-                                    paddingAngle={5}
-                                    dataKey="value"
-                                >
-                                    {pieData.map((entry, index) => (
-                                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                    ))}
-                                </Pie>
-                                <Tooltip />
-                                <Legend verticalAlign="bottom" height={36} />
-                            </PieChart>
-                        </ResponsiveContainer>
+            <div className="card">
+                <h3 style={{ fontSize: '1.125rem', fontWeight: '700', marginBottom: '1.5rem' }}>
+                    System Information
+                </h3>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', backgroundColor: '#111111', borderRadius: '8px' }}>
+                        <span style={{ color: 'var(--text-light)' }}>Total Complaints:</span>
+                        <span style={{ fontWeight: '700' }}>{metrics.totalComplaints}</span>
                     </div>
-                </div>
-
-                {/* Weekly Trend */}
-                <div className="card">
-                    <h3 style={{ fontSize: '1.125rem', fontWeight: '700', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                        <TrendingUp size={20} /> Weekly Activity
-                    </h3>
-                    <div style={{ height: '300px' }}>
-                        <ResponsiveContainer width="100%" height="100%">
-                            <BarChart data={barData}>
-                                <XAxis dataKey="name" axisLine={false} tickLine={false} />
-                                <YAxis axisLine={false} tickLine={false} />
-                                <Tooltip cursor={{ fill: 'transparent' }} />
-                                <Bar dataKey="count" fill="var(--primary-blue)" radius={[4, 4, 0, 0]} />
-                            </BarChart>
-                        </ResponsiveContainer>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', backgroundColor: '#111111', borderRadius: '8px' }}>
+                        <span style={{ color: 'var(--text-light)' }}>Pending Complaints:</span>
+                        <span style={{ fontWeight: '700', color: '#f59e0b' }}>{metrics.activeComplaints - metrics.inProgress}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', backgroundColor: '#111111', borderRadius: '8px' }}>
+                        <span style={{ color: 'var(--text-light)' }}>In Progress:</span>
+                        <span style={{ fontWeight: '700', color: 'var(--primary-blue)' }}>{metrics.inProgress}</span>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', padding: '1rem', backgroundColor: '#111111', borderRadius: '8px' }}>
+                        <span style={{ color: 'var(--text-light)' }}>Resolved:</span>
+                        <span style={{ fontWeight: '700', color: '#10b981' }}>{metrics.resolvedMonthly}</span>
                     </div>
                 </div>
             </div>

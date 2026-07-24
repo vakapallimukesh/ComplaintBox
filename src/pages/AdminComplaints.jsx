@@ -74,47 +74,58 @@ const AdminComplaints = () => {
             </div>
 
             <div className="card" style={{ padding: '0', overflowX: 'auto' }}>
-                <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                    <thead>
-                        <tr style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
-                            <th style={{ padding: '1.25rem 1.5rem', fontWeight: '600', fontSize: '0.875rem' }}>ID</th>
-                            <th style={{ padding: '1.25rem 1.5rem', fontWeight: '600', fontSize: '0.875rem' }}>Student Name</th>
-                            <th style={{ padding: '1.25rem 1.5rem', fontWeight: '600', fontSize: '0.875rem' }}>Category</th>
-                            <th style={{ padding: '1.25rem 1.5rem', fontWeight: '600', fontSize: '0.875rem' }}>Date</th>
-                            <th style={{ padding: '1.25rem 1.5rem', fontWeight: '600', fontSize: '0.875rem' }}>Status</th>
-                            <th style={{ padding: '1.25rem 1.5rem', fontWeight: '600', fontSize: '0.875rem', textAlign: 'right' }}>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {allComplaints.map((complaint) => (
-                            <tr key={complaint.id} style={{ borderBottom: '1px solid #27272a' }}>
-                                <td style={{ padding: '1.25rem 1.5rem', fontWeight: '600', color: 'var(--primary-blue)' }}>{complaint.id}</td>
-                                <td style={{ padding: '1.25rem 1.5rem' }}>{complaint.student}</td>
-                                <td style={{ padding: '1.25rem 1.5rem' }}>{complaint.category}</td>
-                                <td style={{ padding: '1.25rem 1.5rem', color: 'var(--text-light)' }}>{complaint.date}</td>
-                                <td style={{ padding: '1.25rem 1.5rem' }}>{getStatusBadge(complaint.status)}</td>
-                                <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
-                                    <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
-                                        <button className="btn btn-outline" style={{ padding: '0.4rem' }} title="View Details">
-                                            <Eye size={18} />
-                                        </button>
-                                        <button
-                                            className="btn btn-primary"
-                                            style={{ padding: '0.4rem', backgroundColor: 'var(--primary-blue)' }}
-                                            title="Update Status"
-                                            onClick={() => navigate(`/admin/update/${complaint.id}`)}
-                                        >
-                                            <Edit size={18} />
-                                        </button>
-                                        <button className="btn btn-outline" style={{ padding: '0.4rem', border: '1px solid var(--danger)', color: 'var(--danger)' }} title="Delete">
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                </td>
+                {allComplaints.length === 0 ? (
+                    <div style={{ padding: '3rem', textAlign: 'center' }}>
+                        <p style={{ color: 'var(--text-light)', marginBottom: '1rem', fontSize: '1.1rem' }}>
+                            No complaints submitted yet.
+                        </p>
+                        <p style={{ color: 'var(--text-light)', fontSize: '0.9rem' }}>
+                            Complaints will appear here once students start submitting them.
+                        </p>
+                    </div>
+                ) : (
+                    <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
+                        <thead>
+                            <tr style={{ backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb' }}>
+                                <th style={{ padding: '1.25rem 1.5rem', fontWeight: '600', fontSize: '0.875rem' }}>ID</th>
+                                <th style={{ padding: '1.25rem 1.5rem', fontWeight: '600', fontSize: '0.875rem' }}>Student Name</th>
+                                <th style={{ padding: '1.25rem 1.5rem', fontWeight: '600', fontSize: '0.875rem' }}>Category</th>
+                                <th style={{ padding: '1.25rem 1.5rem', fontWeight: '600', fontSize: '0.875rem' }}>Date</th>
+                                <th style={{ padding: '1.25rem 1.5rem', fontWeight: '600', fontSize: '0.875rem' }}>Status</th>
+                                <th style={{ padding: '1.25rem 1.5rem', fontWeight: '600', fontSize: '0.875rem', textAlign: 'right' }}>Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {allComplaints.map((complaint) => (
+                                <tr key={complaint.id} style={{ borderBottom: '1px solid #27272a' }}>
+                                    <td style={{ padding: '1.25rem 1.5rem', fontWeight: '600', color: 'var(--primary-blue)' }}>{complaint.id}</td>
+                                    <td style={{ padding: '1.25rem 1.5rem' }}>{complaint.student}</td>
+                                    <td style={{ padding: '1.25rem 1.5rem' }}>{complaint.category}</td>
+                                    <td style={{ padding: '1.25rem 1.5rem', color: 'var(--text-light)' }}>{complaint.date}</td>
+                                    <td style={{ padding: '1.25rem 1.5rem' }}>{getStatusBadge(complaint.status)}</td>
+                                    <td style={{ padding: '1.25rem 1.5rem', textAlign: 'right' }}>
+                                        <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' }}>
+                                            <button className="btn btn-outline" style={{ padding: '0.4rem' }} title="View Details">
+                                                <Eye size={18} />
+                                            </button>
+                                            <button
+                                                className="btn btn-primary"
+                                                style={{ padding: '0.4rem', backgroundColor: 'var(--primary-blue)' }}
+                                                title="Update Status"
+                                                onClick={() => navigate(`/admin/update/${complaint.id}`)}
+                                            >
+                                                <Edit size={18} />
+                                            </button>
+                                            <button className="btn btn-outline" style={{ padding: '0.4rem', border: '1px solid var(--danger)', color: 'var(--danger)' }} title="Delete">
+                                                <Trash2 size={18} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
         </div>
     );

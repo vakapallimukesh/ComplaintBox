@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ClipboardList, Clock, CheckCircle, PlusCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getUserComplaints } from '../api/auth';
 
 const StatCard = ({ title, count, icon, color }) => (
     <div className="card" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', borderLeft: `4px solid ${color}` }}>
@@ -17,14 +18,37 @@ const StatCard = ({ title, count, icon, color }) => (
 const Dashboard = () => {
     const navigate = useNavigate();
     const [userName, setUserName] = useState('Student');
+    const [stats, setStats] = useState({
+        total: 0,
+        pending: 0,
+        inProgress: 0,
+        resolved: 0
+    });
 
     useEffect(() => {
         const savedUser = localStorage.getItem('complaintUser');
         if (savedUser) {
             const parsed = JSON.parse(savedUser);
             setUserName(parsed.name || parsed.fullName || 'Student');
+            loadUserStats(parsed.id);
         }
     }, []);
+
+    const loadUserStats = async (userId) => {
+        try {
+            const data = await getUserComplaints(userId);
+            const complaints = data.complaints || [];
+            
+            setStats({
+                total: complaints.length,
+                pending: complaints.filter(c => c.status === 'Pending').length,
+                inProgress: complaints.filter(c => c.status === 'In Progress').length,
+                resolved: complaints.filter(c => c.status === 'Resolved').length
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
     return (
         <div>
@@ -42,10 +66,10 @@ const Dashboard = () => {
             </div>
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1.5rem', marginBottom: '2.5rem' }}>
-                <StatCard title="Total Complaints" count="12" icon={<ClipboardList size={24} />} color="var(--primary-blue)" />
-                <StatCard title="Pending" count="4" icon={<Clock size={24} />} color="var(--warning)" />
-                <StatCard title="In Progress" count="3" icon={<Clock size={24} />} color="var(--primary-blue)" />
-                <StatCard title="Resolved" count="5" icon={<CheckCircle size={24} />} color="var(--success)" />
+                <StatCard title="Total Complaints" count={stats.total} icon={<ClipboardList size={24} />} color="var(--primary-blue)" />
+                <StatCard title="Pending" count={stats.pending} icon={<Clock size={24} />} color="var(--warning)" />
+                <StatCard title="In Progress" count={stats.inProgress} icon={<Clock size={24} />} color="var(--primary-blue)" />
+                <StatCard title="Resolved" count={stats.resolved} icon={<CheckCircle size={24} />} color="var(--success)" />
             </div>
 
             <div className="card">
@@ -59,8 +83,17 @@ const Dashboard = () => {
                     </button>
                 </div>
                 <div style={{ textAlign: 'center', padding: '2rem' }}>
-                    <p style={{ color: 'var(--text-light)', marginBottom: '1.5rem' }}>No recent activity to show in the last 24 hours.</p>
-                    <button className="btn btn-outline" onClick={() => navigate('/complaint-portal')}>Go to Complaint Portal</button>
+                    {stats.total === 0 ? (
+                        <>
+                            <p style={{ color: 'var(--text-light)', marginBottom: '1.5rem' }}>You haven't submitted any complaints yet.</p>
+                            <button className="btn btn-primary" onClick={() => navigate('/complaint-portal')}>Raise Your First Complaint</button>
+                        </>
+                    ) : (
+                        <>
+                            <p style={{ color: 'var(--text-light)', marginBottom: '1.5rem' }}>View all your complaints and their current status.</p>
+                            <button className="btn btn-outline" onClick={() => navigate('/my-complaints')}>Go to My Complaints</button>
+                        </>
+                    )}
                 </div>
             </div>
         </div>
