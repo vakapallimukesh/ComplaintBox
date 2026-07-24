@@ -10,15 +10,32 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 const PORT = process.env.PORT || 5001;
 
-// Setup database
-const file = join(__dirname, 'db.json');
-const adapter = new JSONFile(file);
-const db = new Low(adapter, {});
+// Setup database with error handling
+let db;
+let file;
 
-// Initialize database
-await db.read();
-db.data ||= { users: [], complaints: [] };
-await db.write();
+async function initializeDatabase() {
+  try {
+    file = join(__dirname, 'db.json');
+    const adapter = new JSONFile(file);
+    db = new Low(adapter, {});
+    
+    await db.read();
+    db.data ||= { users: [], complaints: [] };
+    await db.write();
+    
+    console.log('✅ Database initialized successfully');
+    return true;
+  } catch (error) {
+    console.error('Database initialization error:', error);
+    // Use in-memory database as fallback
+    db = { data: { users: [], complaints: [] } };
+    db.write = async () => {};
+    db.read = async () => {};
+    console.log('⚠️ Using in-memory database');
+    return false;
+  }
+}
 
 // CORS configuration
 const allowedOrigins = [
@@ -298,11 +315,26 @@ app.post('/api/auth/reset', async (req, res) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Backend server is running', dbSize: db.data.users.length + db.data.complaints.length });
+  res.json({ 
+    status: 'ok', 
+    message: 'Backend server is running', 
+    users: db.data?.users?.length || 0,
+    complaints: db.data?.complaints?.length || 0
+  });
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`✅ Backend server running on http://localhost:${PORT}`);
-  console.log(`📊 Database file: ${file}`);
+async function startServer() {
+  await initializeDatabase();
+  
+  app.listen(PORT, () => {
+    console.log(`✅ Backend server running on http://localhost:${PORT}`);
+    console.log(`📊 Database: ${file || 'in-memory'}`);
+    console.log(`🌍 Ready to accept connections`);
+  });
+}
+
+startServer().catch(error => {
+  console.error('Failed to start server:', error);
+  process.exit(1);
 });
